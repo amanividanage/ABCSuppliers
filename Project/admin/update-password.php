@@ -48,21 +48,20 @@
     </div>
 </div>
 <?php 
- //check whether the submit button is click
- if(isset($_POST['submit'])){
-    //get the data
-    $id =$_POST['id'];
-    $current_password = $_POST['current_password'];
-    $new_password = $_POST['new_password'];
-    $confirm_password = $_POST['confirm_password'];
-    
-    //check whether the current password holder exists
+    //check whether the submit button is click
+    if(isset($_POST['submit'])){
+        //get the data
+        $id =$_POST['id'];
+        $current_password = $_POST['current_password'];
+        $new_password = $_POST['new_password'];
+        $confirm_password = $_POST['confirm_password'];
+        
+        //check whether the current password holder exists
 
-    $hashed_current_password = password_hash($current_password, PASSWORD_BCRYPT);
-    $hashed_new_password = password_hash($new_password, PASSWORD_BCRYPT);
+        $hashed_current_password = password_hash($current_password, PASSWORD_BCRYPT);
+        $hashed_new_password = password_hash($new_password, PASSWORD_BCRYPT);
 
-    $sql = "SELECT * FROM tbl_admin WHERE id =$id AND password='$hashed_current_password'";
-
+        $sql = "SELECT * FROM tbl_admin WHERE id =$id AND password='$hashed_current_password'";
 
         // //execute the query
         // $res = mysqli_query($conn ,$sql);
