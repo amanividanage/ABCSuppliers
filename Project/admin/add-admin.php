@@ -49,27 +49,35 @@
         $hashed_password = password_hash($password, PASSWORD_BCRYPT);
         
         //insering data to the admin table
-        $sql = "INSERT INTO tbl_admin SET   
-                full_name = '$full_name',
-                username = '$username',
-                password = '$hashed_password'
-        ";
-        //executing query and saving data into database
-        $res = mysqli_query($conn, $sql) or die(mysqli_error($conn));
+       //insering data to the admin table
+$sql = "INSERT INTO tbl_admin (full_name, username, password) VALUES (?, ?, ?)";
 
-        if($res == TRUE){
-            $_SESSION['add'] = '<div class="success">Admin Added Successfully</div>';
-            //redirect to the manage admin page
-            header("location:".SITEURL.'admin/manage-admin.php');
-        }
-        else{
-            $_SESSION['add'] = '<div class="error">Failed to add admin</div>';
-            //redirect to the add admin page
-            header("location:".SITEURL.'admin/add-admin.php');
-        }
+// Prepare the statement
+$stmt = mysqli_prepare($conn, $sql);
 
+// Bind the parameters
+mysqli_stmt_bind_param($stmt, "sss", $full_name, $username, $hashed_password);
+
+// Execute the statement
+$res = mysqli_stmt_execute($stmt);
+
+// Close the statement
+mysqli_stmt_close($stmt);
+
+if($res){
+    $_SESSION['add'] = '<div class="success">Admin Added Successfully</div>';
+    //redirect to the manage admin page
+    header("location:".SITEURL.'admin/manage-admin.php');
+}
+else{
+    $_SESSION['add'] = '<div class="error">Failed to add admin</div>';
+    //redirect to the add admin page
+    header("location:".SITEURL.'admin/add-admin.php');
+}
     }
-    
+
+
+
 
 
 ?>
