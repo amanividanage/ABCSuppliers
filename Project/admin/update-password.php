@@ -61,79 +61,55 @@
         $hashed_current_password = password_hash($current_password, PASSWORD_BCRYPT);
         $hashed_new_password = password_hash($new_password, PASSWORD_BCRYPT);
 
-        $sql = "SELECT * FROM tbl_admin WHERE id =$id AND password='$hashed_current_password'";
+       // SELECT query to check if the provided password matches the one in the database
+$sql = "SELECT * FROM tbl_admin WHERE id = ? AND password = ?";
 
-        // //execute the query
-        // $res = mysqli_query($conn ,$sql);
-        $stmt = mysqli_prepare($conn, $sql);
-        mysqli_stmt_bind_param($stmt, "is", $id, $current_password);
-        mysqli_stmt_execute($stmt);
-        $result = mysqli_stmt_get_result($stmt);
-        $res = mysqli_stmt_execute($stmt);
-
-        if($res ==TRUE){
-            //check whether the data is available
-            $count = mysqli_num_rows($res);
-            if($count ==1 ){
-                //check whether new pwd and confirm pwd match
-                if($new_password == $confirm_password){
-                    //update the password
-                    $sql2 = "UPDATE tbl_admin SET 
-                    password=? 
-                    WHERE id = ?";
-                    // prepare statement
-$stmt = mysqli_prepare($conn, $sql2);
+// prepare statement
+$stmt = mysqli_prepare($conn, $sql);
 
 // bind parameters
-mysqli_stmt_bind_param($stmt, "si", $new_password, $id);
+mysqli_stmt_bind_param($stmt, "is", $id, $hashed_current_password);
 
 // execute statement
-$res2 = mysqli_stmt_execute($stmt);
+mysqli_stmt_execute($stmt);
 
+// get the result
+$result = mysqli_stmt_get_result($stmt);
 
-// check the query execution
-if($res2==TRUE){
-    $_SESSION['change-pwd'] = "<div class='success'>Password Changed Successfully</div>";
-    header("location:".SITEURL.'admin/manage-admin.php');
-}
-else{
-    $_SESSION['change-pwd'] = "<div class='error'>Failed to change password</div>";
-    header("location:".SITEURL.'admin/manage-admin.php');
-
-}
-
-                    // //execute the query
-                    // $res2 = mysqli_query($conn, $sql2);
-                    // //check the query execution
-                    // if($res2==TRUE){
-                    //     $_SESSION['change-pwd'] = "<div class='success'>Password Changed Successfully</div>";
-                    //     header("location:".SITEURL.'admin/manage-admin.php');
-                    // }
-                    // else{
-                    //     $_SESSION['change-pwd'] = "<div class='error'>Failed to change password</div>";
-                    //     header("location:".SITEURL.'admin/manage-admin.php');
-
-                    // }
-                }
-                else{
-                    //redirect to manage admin
-                    $_SESSION['pwd-not-match'] = "<div class='error'>Password Did Not Match</div>";
-                    header("location:".SITEURL.'admin/manage-admin.php');
-                }
-
-            }
-            else{
-                $_SESSION['user-not-found'] = "<div class='error'>User Not Found</div>";
+// check if the query execution was successful
+if ($result) {
+    // check if a record was returned
+    $count = mysqli_num_rows($result);
+    if ($count == 1) {
+        // check if the new password and confirm password match
+        if ($new_password == $confirm_password) {
+            // update the password
+            $sql2 = "UPDATE tbl_admin SET password = ? WHERE id = ?";
+            
+            // prepare statement
+            $stmt2 = mysqli_prepare($conn, $sql2);
+            
+            // bind parameters
+            mysqli_stmt_bind_param($stmt2, "si", $new_password, $id);
+            
+            // execute statement
+            $res2 = mysqli_stmt_execute($stmt2);
+            
+            // check if the query execution was successful
+            if ($res2 == TRUE) {
+                $_SESSION['change-pwd'] = "<div class='success'>Password Changed Successfully</div>";
+                header("location:".SITEURL.'admin/manage-admin.php');
+            } else {
+                $_SESSION['change-pwd'] = "<div class='error'>Failed to change password</div>";
                 header("location:".SITEURL.'admin/manage-admin.php');
             }
+        } else {
+            // redirect to manage admin
+            $_SESSION['pwd-not-match'] = "<div class='error'>Password Did Not Match</div>";
+            header("location:".SITEURL.'admin/manage-admin.php');
         }
-
-        
-        //change pwd 
+    } else {
+        $_SESSION['user-not-found'] = "<div class='error'>User Not Found</div>";
+        header("location:".SITEURL.'admin/manage-admin.php');
     }
-
-?>
-
-
-
-<?php include('partials/footer.php') ?>
+}
