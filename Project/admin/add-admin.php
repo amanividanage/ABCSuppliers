@@ -43,13 +43,16 @@
     if(isset($_POST['submit'])){
         $full_name = mysqli_real_escape_string($conn,$_POST['full_name']);
         $username = mysqli_real_escape_string($conn,$_POST['username']);
-        $password = mysqli_real_escape_string($conn,md5($_POST['password'])); //md5 is used for encrpyting the password 
-
+        //$password = mysqli_real_escape_string($conn,md5($_POST['password'])); //md5 is used for encrpyting the password 
+        $password = $_POST['password'];
+// hash the password using a stronger algorithm
+        $hashed_password = password_hash($password, PASSWORD_BCRYPT);
+        
         //insering data to the admin table
         $sql = "INSERT INTO tbl_admin SET   
                 full_name = '$full_name',
                 username = '$username',
-                password = '$password'
+                password = '$hashed_password'
         ";
         //executing query and saving data into database
         $res = mysqli_query($conn, $sql) or die(mysqli_error($conn));

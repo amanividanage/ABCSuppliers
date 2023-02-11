@@ -47,10 +47,12 @@ if(isset($_POST['submit'])){
     //Process for login
     //get the data from form
     $username = mysqli_real_escape_string($conn,$_POST['username']);
-    $password = mysqli_real_escape_string($conn,md5($_POST['password']));
-    
+    //$password = mysqli_real_escape_string($conn,md5($_POST['password']));
+    $password = $_POST['password'];
+
+
     //sql query to check the username and pwd existance
-    $sql = "SELECT * FROM tbl_admin WHERE username='$username' AND password='$password'"; 
+    $sql = "SELECT * FROM tbl_admin WHERE username='$username'"; 
     //execute tthe query
     $res = mysqli_query($conn,$sql);
     //count rows to check whether the user exists or not 
@@ -58,6 +60,9 @@ if(isset($_POST['submit'])){
 
     if($count == 1){
         //user exists
+        $hash = $row['password'];
+        if(password_verify($password, $hash)){
+            //login success
         $_SESSION['login'] = "<div class='success'>Login Successful</div>";
         $_SESSION['user'] = "<div class='admin-name'>$username</div>"; //to check whether the user is logged or not
 
@@ -71,6 +76,7 @@ if(isset($_POST['submit'])){
         //redirect to login page
         header('location:'.SITEURL.'admin/login.php');
     }
+}
 }
 
 ?>
